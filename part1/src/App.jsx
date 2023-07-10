@@ -1,6 +1,4 @@
 import { useState } from "react"
-import axios from 'axios'
-
 
 function App() {
   const [persons, setPersons] = useState([
@@ -53,12 +51,6 @@ function App() {
     setPersons(persons.concat(personObject))
     setNewName('')
   }
-
-const promise = axios.get('http://localhost:3001/notes')
-console.log(promise)
-
-const promise2 = axios.get('http://localhost:3001/foobar')
-console.log(promise2)
 
   return (
     <div>
