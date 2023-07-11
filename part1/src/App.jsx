@@ -1,80 +1,57 @@
-import { useState } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react"
+import axios from 'axios'
 
 function App() {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
-  const [filter, setFilter] = useState('')
+  const [ country, setCountry ] = useState([])
+  const [ filteredCounntries, setFilteredCountries ] = useState([])
 
-  const handleChangePerson = (event) => {
-    setNewName(event.target.value)
-  }
+  useEffect(() => {
+    axios
+      .get(`https://restcountries.com/v3.1/all`)
+      .then(response => {
+        setCountry(response.data)
+        console.log(response.data)
+      })
+  },[])
 
-  const handleChangeNumber = (event) => {
-    setNewNumber(event.target.value)
-  }
-
-  const handleChangeFilter = (event) => {
-    if (event.target.value === '') {
-      setPersons(persons)
-      return
+  const handleChangeCountry = (event) => {
+    const inputValue = event.target.value.toLowerCase()
+  
+    if (inputValue === '') {
+      setFilteredCountries([])
+    } else {
+      const filtered = country.filter(countrie => {
+        const countryName = countrie.name.common.toLowerCase()
+        return countryName.includes(inputValue)
+      })
+      setFilteredCountries(filtered)
     }
-
-    setFilter(event.target.value)
-    console.log(event.target.value)
-
-    const filteredPersons = persons.filter(person => {
-      return person.name.toLowerCase().includes(filter.toLowerCase())
-    })
-
-    setPersons(filteredPersons)
-  }
-
-  const addPerson = (event) => {
-    event.preventDefault()
-    if (persons.find(person => {
-      person.name === newName || person.number === newNumber
-    })) {
-      alert(`${newName} is already added to phonebook and used ${newNumber}`)
-      return
-    }
-
-    const personObject = {
-      name: newName,
-      number: newNumber
-    }
-    setPersons(persons.concat(personObject))
-    setNewName('')
   }
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <div>
-        Filter shown with <input onChange={handleChangeFilter} />
-      </div>
-      <h2>Add a new user</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input onChange={handleChangePerson} />
-        </div>
-        <div>
-          number: <input onChange={handleChangeNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
+      <form>
+        <label>Find countries</label>
+        <input type="text" onChange={handleChangeCountry} />
       </form>
-      <h2>Numbers</h2>
       <div>
-        {
-          persons.map(person => <p key={person.name}>Name: {person.name}<br />Number: {person.number} </p>)
-        }
+        <h1>Countries</h1>
+        <div>
+          {
+            filteredCounntries.length >= 10 ? <p>Too many matches, write more</p> : filteredCounntries.map((item) => {
+              return (
+                <div key={item.name.common}>
+                  <h2>{item.name.common}</h2>
+                  <img src={item.flags.png} alt={item.name.common} width="200" />
+                  <p>Capital: {item.capital}</p>
+                  <p>Region: {item.region}</p>
+                  <p>Population: {item.population}</p>
+                </div>
+              )
+            })
+          }
+        </div>
       </div>
     </div>
   )
