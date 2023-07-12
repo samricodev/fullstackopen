@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react"
 import axios from 'axios'
+import './app.css'
 
 function App() {
   const [ country, setCountry ] = useState([])
@@ -30,18 +31,19 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="container">
+      <h1>Country Finder</h1>
       <form>
-        <label>Find countries</label>
+        <label>Find countries </label>
         <input type="text" onChange={handleChangeCountry} />
       </form>
-      <div>
+      <div className="container">
         <h1>Countries</h1>
-        <div>
+        <div className="container">
           {
             filteredCounntries.length >= 10 ? <p>Too many matches, write more</p> : filteredCounntries.map((item) => {
               return (
-                <div key={item.name.common}>
+                <div key={item.name.common} className="card">
                   <h2>{item.name.common}</h2>
                   <img src={item.flags.png} alt={item.name.common} width="200" />
                   <p>Capital: {item.capital}</p>
