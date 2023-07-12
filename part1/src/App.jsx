@@ -4,25 +4,24 @@ import axios from 'axios'
 import './app.css'
 
 function App() {
-  const [ country, setCountry ] = useState([])
-  const [ filteredCounntries, setFilteredCountries ] = useState([])
+  const [countries, setCountries] = useState([])
+  const [filteredCountries, setFilteredCountries] = useState([])
 
   useEffect(() => {
     axios
       .get(`https://restcountries.com/v3.1/all`)
       .then(response => {
-        setCountry(response.data)
-        console.log(response.data)
+        setCountries(response.data)
       })
-  },[])
+  }, [])
 
   const handleChangeCountry = (event) => {
     const inputValue = event.target.value.toLowerCase()
-  
+
     if (inputValue === '') {
       setFilteredCountries([])
     } else {
-      const filtered = country.filter(countrie => {
+      const filtered = countries.filter(countrie => {
         const countryName = countrie.name.common.toLowerCase()
         return countryName.includes(inputValue)
       })
@@ -41,7 +40,7 @@ function App() {
         <h1>Countries</h1>
         <div className="container">
           {
-            filteredCounntries.length >= 10 ? <p>Too many matches, write more</p> : filteredCounntries.map((item) => {
+            filteredCountries.length >= 10 ? <p>Too many matches, write more</p> : filteredCountries.map((item) => {
               return (
                 <div key={item.name.common} className="card">
                   <h2>{item.name.common}</h2>
