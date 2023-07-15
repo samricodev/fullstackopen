@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import noteService from './services/notes'
 
 function App() {
+  //States
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
