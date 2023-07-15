@@ -1,15 +1,19 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import noteService from './services/notes'
 
 function App() {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+
+  useEffect(() => {
+    noteService
+      .getAllPersons()
+      .then(initialNotes => {
+        setPersons(initialNotes)
+      })
+  }, [])
 
   const handleChangePerson = (event) => {
     setNewName(event.target.value)
@@ -20,36 +24,69 @@ function App() {
   }
 
   const handleChangeFilter = (event) => {
-    if (event.target.value === '') {
+    const input = event.target.value.toLowerCase()
+
+    if (input === '') {
       setPersons(persons)
       return
     }
 
-    setFilter(event.target.value)
-    console.log(event.target.value)
-
     const filteredPersons = persons.filter(person => {
-      return person.name.toLowerCase().includes(filter.toLowerCase())
+      return person.name.toLowerCase().includes(filter.toString())
     })
 
+    setFilter(input)
     setPersons(filteredPersons)
   }
 
   const addPerson = (event) => {
     event.preventDefault()
-    if (persons.find(person => {
-      person.name === newName || person.number === newNumber
-    })) {
-      alert(`${newName} is already added to phonebook and used ${newNumber}`)
+
+    if (newName == '' || newNumber == '') {
+      alert('Please, complete the fields')
       return
     }
 
-    const personObject = {
-      name: newName,
-      number: newNumber
+    if (persons.find(person => person.name === newName && person.number !== newNumber)) {
+      const confirmNewNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+      if (confirmNewNumber) {
+        noteService
+          .updatePerson(persons.find(person => person.name === newName).id, { name: newName, number: newNumber })
+          .then(returnedNote => {
+            setPersons(persons.map(person => person.id !== returnedNote.id ? person : returnedNote))
+          })
+      }
+    } else if (persons.find(person => person.name === newName && person.number === newNumber)) {
+        alert(`${newName} is already added to phonebook`)
+    } else {
+      const personObject = {
+        name: newName,
+        number: newNumber
+      }
+
+      noteService
+        .createPerson(personObject)
+        .then(returnedNote => {
+          setPersons(persons.concat(returnedNote))
+        })
+        .catch(() => alert("Failed adding"))
     }
-    setPersons(persons.concat(personObject))
+
     setNewName('')
+    setNewNumber('')
+  }
+
+  const deletePerson = id => {
+    const person = persons.find(p => p.id === id)
+    const result = window.confirm(`Delete ${person.name}?`)
+    if (result) {
+      noteService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== id))
+        })
+        .catch(() => alert("Failed deleting"))
+    }
   }
 
   return (
@@ -73,7 +110,14 @@ function App() {
       <h2>Numbers</h2>
       <div>
         {
-          persons.map(person => <p key={person.name}>Name: {person.name}<br />Number: {person.number} </p>)
+          persons.map(person => {
+            return (
+              <div key={person.id}>
+                <p>Name: {person.name}<br />Number: {person.number} </p>
+                <button onClick={() => deletePerson(person.id)}>Delete</button>
+              </div>
+            )
+          })
         }
       </div>
     </div>
