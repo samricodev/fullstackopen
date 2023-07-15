@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import noteService from './services/notes'
+import Message from './components/Message'
 
 function App() {
   //States
@@ -7,6 +8,8 @@ function App() {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState('')
+  const [typeMessage, setTypeMessage] = useState('')
 
   useEffect(() => {
     noteService
@@ -44,7 +47,12 @@ function App() {
     event.preventDefault()
 
     if (newName == '' || newNumber == '') {
-      alert('Please, complete the fields')
+      setMessage('Complete the fields')
+      setTypeMessage('error')
+      setTimeout(() => {
+        setMessage(null)
+        setTypeMessage(null)
+      }, 5000)
       return
     }
 
@@ -53,8 +61,15 @@ function App() {
       if (confirmNewNumber) {
         noteService
           .updatePerson(persons.find(person => person.name === newName).id, { name: newName, number: newNumber })
-          .then(returnedNote => {
-            setPersons(persons.map(person => person.id !== returnedNote.id ? person : returnedNote))
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson))
+            setMessage(`Modified ${returnedPerson.name}`)
+            setTypeMessage('success')
+            setTimeout(() => {
+              setMessage(null)
+              setTypeMessage(null)
+              }, 5000
+            )
           })
       }
     } else if (persons.find(person => person.name === newName && person.number === newNumber)) {
@@ -67,8 +82,15 @@ function App() {
 
       noteService
         .createPerson(personObject)
-        .then(returnedNote => {
-          setPersons(persons.concat(returnedNote))
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setMessage(`Added ${returnedPerson.name}`)
+          setTypeMessage('success')
+          setTimeout(() => {
+            setMessage(null)
+            setTypeMessage(null)
+            }, 5000
+          )
         })
         .catch(() => alert("Failed adding"))
     }
@@ -85,6 +107,13 @@ function App() {
         .deletePerson(id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== id))
+          setMessage(`Deleted ${person.name}`)
+          setTypeMessage('error')
+          setTimeout(() => {
+            setMessage(null)
+            setTypeMessage(null)
+            }, 5000
+          )
         })
         .catch(() => alert("Failed deleting"))
     }
@@ -93,6 +122,7 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message message={message} type={typeMessage}/>
       <div>
         Filter shown with <input onChange={handleChangeFilter} />
       </div>

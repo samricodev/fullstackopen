@@ -1,0 +1,15 @@
+.success{
+    background-color: #202020;
+    color: #eee;
+    border: 1px solid rgb(89, 160, 89);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.error{
+    background-color: #202020;
+    color: #eee;
+    border: 1px solid red;
+    font-weight: bold;
+    font-size: 1.2em;
+}
