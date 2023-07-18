@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import noteService from './services/notes'
+import personService from './services/persons'
 import Message from './components/Message'
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
   const [typeMessage, setTypeMessage] = useState('')
 
   useEffect(() => {
-    noteService
+    personService
       .getAllPersons()
       .then(initialNotes => {
         setPersons(initialNotes)
@@ -59,7 +59,7 @@ function App() {
     if (persons.find(person => person.name === newName && person.number !== newNumber)) {
       const confirmNewNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
       if (confirmNewNumber) {
-        noteService
+        personService
           .updatePerson(persons.find(person => person.name === newName).id, { name: newName, number: newNumber })
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson))
@@ -80,7 +80,7 @@ function App() {
         number: newNumber
       }
 
-      noteService
+      personService
         .createPerson(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
@@ -103,7 +103,7 @@ function App() {
     const person = persons.find(p => p.id === id)
     const result = window.confirm(`Delete ${person.name}?`)
     if (result) {
-      noteService
+      personService
         .deletePerson(id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== id))
