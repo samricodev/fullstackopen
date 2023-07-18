@@ -1,0 +1,14 @@
+###
+GET http://127.0.0.1:3001 HTTP/1.1
+###
+GET http://127.0.0.1:3001/api/notes HTTP/1.1
+###
+POST http://127.0.0.1:3001/api/notes HTTP/1.1
+Content-Type: application/json
+
+{
+        "id": 4,
+        "content": "HTML is easy",
+        "date": "2019-05-30T17:30:31.098Z",
+        "important": true
+}
