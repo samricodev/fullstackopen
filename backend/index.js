@@ -1,11 +1,27 @@
 const express = require('express')
 const cors = require('cors')
+const morgan = require('morgan')
+
 const app = express()
 const PORT = 3001
+
+//Tokens morgan
+morgan.token('body', (req, res) => req.method === 'POST' ? JSON.stringify(req.body) : '')
 
 //Middlewares
 app.use(express.json())
 app.use(cors())
+app.use(morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, 'content-length'), '-',
+      tokens['response-time'](req, res), 'ms',
+      tokens.body(req, res),
+    ].join(' ')
+  }))
+
 
 let persons = [
     {
@@ -78,7 +94,7 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    if(persons.find( person => person.name == body.name)){
+    if (persons.find(person => person.name == body.name)) {
         return response.status(400).json({
             error: 'name must be unique'
         })
@@ -102,6 +118,12 @@ app.delete('/api/persons/:id', (request, response) => {
 
     response.status(204).end()
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 app.listen(PORT, () => {
     console.log(`Server running on  http://127.0.0.1:${PORT} 🚀`)
