@@ -3,12 +3,13 @@ const cors = require('cors')
 const morgan = require('morgan')
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 
 //Tokens morgan
 morgan.token('body', (req, res) => req.method === 'POST' ? JSON.stringify(req.body) : '')
 
 //Middlewares
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(cors())
 app.use(morgan((tokens, req, res) => {
@@ -126,5 +127,5 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 app.listen(PORT, () => {
-    console.log(`Server running on  http://127.0.0.1:${PORT} 🚀`)
+    console.log(`Server running on ${PORT} 🚀`)
 })
