@@ -14,8 +14,9 @@ function App() {
   useEffect(() => {
     personService
       .getAllPersons()
-      .then(initialNotes => {
-        setPersons(initialNotes)
+      .then(initialPersons => {
+        setPersons(initialPersons)
+        console.log(initialPersons)
       })
   }, [])
 

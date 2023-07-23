@@ -3,14 +3,14 @@ GET http://127.0.0.1:3001 HTTP/1.1
 ###
 GET http://127.0.0.1:3001/api/persons HTTP/1.1
 ###
-GET http://127.0.0.1:3001/api/persons/2 HTTP/1.1
+GET http://127.0.0.1:3001/api/persons/64bb754df755424c7ffec54f HTTP/1.1
 ###
 POST http://127.0.0.1:3001/api/persons HTTP/1.1
 Content-Type: application/json
         
 {
-        "name": "Samam",
-        "number": ""
+        "name": "Saman",
+        "number": "1234"
 }
 ###
 DELETE http://127.0.0.1:3001/api/persons/2 HTTP/1.1
