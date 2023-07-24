@@ -48,10 +48,16 @@ app.get('/info', (req, res) => {
     res.send(`<p>Phonebook has info for ${peopleLenght} people</p><p>${date}</p>`)
 })
 
-app.get('/api/persons/:id', (req, res) => {
-    Person.findById(req.params.id).then(person => {
-        res.json(person)
-    })
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            if (person) {
+                res.json(person)
+            } else {
+                res.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 //Post
@@ -72,19 +78,50 @@ app.post('/api/persons', (req, res) => {
     })
 })
 
-//Delete
-app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    persons = persons.filter(person => person.id !== id)
+//Put
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+    const id = req.params.id
 
-    res.status(204).end()
+    const personUpdated = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(id, personUpdated, { new: true })
+        .then(updatePerson => {
+            res.json(updatePerson)
+        })
+        .catch(error => next(error))
 })
 
+//Delete
+app.delete('/api/persons/:id', (req, res, next) => {
+    Person.findByIdAndRemove(req.params.id)
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(error => next(error))
+})
+
+//ErrorHandlers
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server running on http://127.0.0.1:${PORT} 🚀`)
